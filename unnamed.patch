@@ -1,0 +1,126 @@
+Index: demo/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/demo/pom.xml b/demo/pom.xml
+--- a/demo/pom.xml	(revision 85b5f6058669fdf3f26e5e9ca3cd7ead0bea02c9)
++++ b/demo/pom.xml	(revision da935c0e2a68c70a18b8f82f159e5a266ecf9a96)
+@@ -56,6 +56,28 @@
+ 			<artifactId>spring-boot-starter-test</artifactId>
+ 			<scope>test</scope>
+ 		</dependency>
++
++		<dependency>
++			<groupId>org.springframework.boot</groupId>
++			<artifactId>spring-boot-starter-security</artifactId>
++		</dependency>
++
++		<!-- JJWT API -->
++		<dependency>
++			<groupId>io.jsonwebtoken</groupId>
++			<artifactId>jjwt-api</artifactId>
++			<version>0.11.5</version>
++		</dependency>
++
++		<!-- JJWT Implementation -->
++		<dependency>
++
++		<groupId>io.jsonwebtoken</groupId>
++		<artifactId>jjwt-impl</artifactId>
++		<version>0.11.5</version>
++		<scope>runtime</scope>
++		</dependency>
++
+ 	</dependencies>
+ 
+ 	<build>
+Index: demo/src/main/java/com/agriconnect/backend/JwtTokenProvider.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/demo/src/main/java/com/agriconnect/backend/JwtTokenProvider.java b/demo/src/main/java/com/agriconnect/backend/JwtTokenProvider.java
+new file mode 100644
+--- /dev/null	(revision da935c0e2a68c70a18b8f82f159e5a266ecf9a96)
++++ b/demo/src/main/java/com/agriconnect/backend/JwtTokenProvider.java	(revision da935c0e2a68c70a18b8f82f159e5a266ecf9a96)
+@@ -0,0 +1,78 @@
++package com.agriconnect.backend;
++
++import io.jsonwebtoken.*;
++import io.jsonwebtoken.security.Keys;
++import org.springframework.beans.factory.annotation.Value;
++import org.springframework.security.core.Authentication;
++import org.springframework.security.core.userdetails.UserDetails;
++import org.springframework.stereotype.Component;
++
++import java.security.Key;
++import java.util.Date;
++
++@Component  // ← Spring will manage this class
++public class JwtTokenProvider {
++
++    // These values come from application.properties
++    @Value("${jwt.secret}")
++    private String jwtSecret;
++
++
++    @Value("${jwt.expiration}")
++    private long jwtExpirationMs;
++
++    // Generate a signing key from the secret
++    private Key getSigningKey() {
++        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
++    }
++
++    /**
++     * GENERATE TOKEN
++     * This creates a new JWT token when user logs in
++     */
++    public String generateToken(Authentication authentication) {
++        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
++
++        Date now = new Date();
++        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
++
++        // Build the token
++        return Jwts.builder()
++                .setSubject(userDetails.getUsername())  // Who is this token for?
++                .setIssuedAt(now)                       // When was it created?
++                .setExpiration(expiryDate)              // When does it expire?
++                .signWith(getSigningKey())              // Sign it with our secret key
++                .compact();                              // Build it!
++    }
++
++    /**
++     * GET USERNAME FROM TOKEN
++     * Extract username from the token
++     */
++    public String getUsernameFromToken(String token) {
++        Claims claims = Jwts.parserBuilder()
++                .setSigningKey(getSigningKey())
++                .build()
++                .parseClaimsJws(token)
++                .getBody();
++
++        return claims.getSubject();
++    }
++
++    /**
++     * VALIDATE TOKEN
++     * Check if token is valid (not expired, not tampered with)
++     */
++    public boolean validateToken(String token) {
++        try {
++            Jwts.parserBuilder()
++                    .setSigningKey(getSigningKey())
++                    .build()
++                    .parseClaimsJws(token);
++            return true;
++        } catch (JwtException | IllegalArgumentException e) {
++            // Token is invalid
++            return false;
++        }
++    }
++}
+\ No newline at end of file
