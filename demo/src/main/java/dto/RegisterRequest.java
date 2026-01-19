@@ -1,7 +1,5 @@
 package com.agriconnect.backend.dto;
 
-import com.agriconnect.backend.model.user;
-
 public class RegisterRequest {
     private String username;
     private String email;
@@ -10,7 +8,7 @@ public class RegisterRequest {
     private String phoneNumber;
     private String barangay;
     private String municipality;
-    private user.UserType userType;
+    private com.agriconnect.backend.model.User.UserType userType;
 
     // Getters and Setters
     public String getUsername() {
@@ -69,11 +67,11 @@ public class RegisterRequest {
         this.municipality = municipality;
     }
 
-    public user.UserType getUserType() {
+    public com.agriconnect.backend.model.User.UserType getUserType() {
         return userType;
     }
 
-    public void setUserType(user.UserType userType) {
+    public void setUserType(com.agriconnect.backend.model.User.UserType userType) {
         this.userType = userType;
     }
 }

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity  // ← This tells Spring: "Hey, this is a database table!"
 @Table(name = "users")  // ← The table name in MySQL will be "users"
-public class user {
+public class User {
 
     // PRIMARY KEY - like a unique ID card for each user
     @Id  // ← This is the primary key
@@ -75,7 +75,7 @@ public class user {
     }
 
     // CONSTRUCTORS
-    public user() {
+    public User() {
         // Empty constructor required by JPA
     }
 
