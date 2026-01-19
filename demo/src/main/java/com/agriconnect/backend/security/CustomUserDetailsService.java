@@ -1,4 +1,4 @@
-package com.agriconnect.backend;
+package com.agriconnect.backend.security;
 
 
 import com.agriconnect.backend.model.User;

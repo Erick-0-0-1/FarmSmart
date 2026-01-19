@@ -1,13 +1,13 @@
-package com.agriconnect.backend;
+package com.agriconnect.backend.security;
 
-import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
+import java.security.Key;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import java.security.Key;
 import java.util.Date;
 
 @Component  // ← Spring will manage this class
@@ -16,7 +16,6 @@ public class JwtTokenProvider {
     // These values come from application.properties
     @Value("${jwt.secret}")
     private String jwtSecret;
-
 
     @Value("${jwt.expiration}")
     private long jwtExpirationMs;
