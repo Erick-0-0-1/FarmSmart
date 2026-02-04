@@ -27,3 +27,61 @@ Action:
 
 Update your application's configuration
 
+2026-02-05T01:31:38.791+08:00  INFO 3128 --- [restartedMain] c.a.backend.BackendApplication           : Starting BackendApplication using Java 25.0.1 with PID 3128 (C:\Users\Erick jay R. Bernal\IdeaProjects\Spring_Boot\demo\target\classes started by Erick jay R. Bernal in C:\Users\Erick jay R. Bernal\IdeaProjects\Spring_Boot)
+2026-02-05T01:31:38.795+08:00  INFO 3128 --- [restartedMain] c.a.backend.BackendApplication           : No active profile set, falling back to 1 default profile: "default"
+2026-02-05T01:31:38.849+08:00  INFO 3128 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-05T01:31:38.849+08:00  INFO 3128 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-05T01:31:39.465+08:00  INFO 3128 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-05T01:31:39.635+08:00  INFO 3128 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 162 ms. Found 7 JPA repository interfaces.
+2026-02-05T01:31:40.000+08:00  WARN 3128 --- [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+2026-02-05T01:31:40.008+08:00  INFO 3128 --- [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-05T01:31:40.029+08:00 ERROR 3128 --- [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'server.port' to java.lang.Integer:
+
+    Property: server.port
+    Value: "${PORT:8080}  # Railway provides PORT environment variable"
+    Origin: class path resource [application.properties] - 3:13
+    Reason: failed to convert java.lang.String to java.lang.Integer (caused by java.lang.NumberFormatException: For input string: "8080#RailwayprovidesPORTenvironmentvariable")
+
+Action:
+
+Update your application's configuration
+
+2026-02-05T01:32:00.072+08:00  INFO 18740 --- [restartedMain] c.a.backend.BackendApplication           : Starting BackendApplication using Java 25.0.1 with PID 18740 (C:\Users\Erick jay R. Bernal\IdeaProjects\Spring_Boot\demo\target\classes started by Erick jay R. Bernal in C:\Users\Erick jay R. Bernal\IdeaProjects\Spring_Boot)
+2026-02-05T01:32:00.076+08:00  INFO 18740 --- [restartedMain] c.a.backend.BackendApplication           : No active profile set, falling back to 1 default profile: "default"
+2026-02-05T01:32:00.143+08:00  INFO 18740 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-05T01:32:00.143+08:00  INFO 18740 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-05T01:32:00.819+08:00  INFO 18740 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-05T01:32:00.966+08:00  INFO 18740 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 140 ms. Found 7 JPA repository interfaces.
+2026-02-05T01:32:01.309+08:00  WARN 18740 --- [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+2026-02-05T01:32:01.316+08:00  INFO 18740 --- [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-05T01:32:01.334+08:00 ERROR 18740 --- [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'server.port' to java.lang.Integer:
+
+    Property: server.port
+    Value: "${PORT:8080}  # Railway provides PORT environment variable"
+    Origin: class path resource [application.properties] - 3:13
+    Reason: failed to convert java.lang.String to java.lang.Integer (caused by java.lang.NumberFormatException: For input string: "8080#RailwayprovidesPORTenvironmentvariable")
+
+Action:
+
+Update your application's configuration
+
