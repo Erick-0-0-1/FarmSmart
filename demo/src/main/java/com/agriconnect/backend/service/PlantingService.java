@@ -38,7 +38,7 @@ public class PlantingService {
         User user = getCurrentUser();
 
         // Get rice variety
-        RiceVariety variety = riceVarietyRepository.findById(request.getVarietyId())
+        RiceVariety variety = riceVarietyRepository.findById(request.getRiceVarietyId())
                 .orElseThrow(() -> new RuntimeException("Rice variety not found"));
 
         // Create planting record

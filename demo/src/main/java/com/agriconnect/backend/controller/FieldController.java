@@ -1,9 +1,9 @@
 package com.agriconnect.backend.controller;
 
-import com.agriconnect.backend.dto.CreateFieldRequest;
 import com.agriconnect.backend.model.Field;
-import com.agriconnect.backend.service.FieldService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.agriconnect.backend.model.User;
+import com.agriconnect.backend.repository.FieldRepository;
+import com.agriconnect.backend.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,87 +11,80 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/fields")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 public class FieldController {
 
-    @Autowired
-    private FieldService fieldService;
+    private final FieldRepository fieldRepository;
+    private final UserRepository userRepository;
 
-    /**
-     * Create a new field
-     * POST /api/fields
-     */
-    @PostMapping
-    public ResponseEntity<?> createField(@RequestBody CreateFieldRequest request) {
-        try {
-            Field field = fieldService.createField(request);
-            return ResponseEntity.ok(field);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public FieldController(FieldRepository fieldRepository, UserRepository userRepository) {
+        this.fieldRepository = fieldRepository;
+        this.userRepository = userRepository;
     }
 
-    /**
-     * Get all my fields
-     * GET /api/fields
-     */
+    // GET all fields
     @GetMapping
-    public ResponseEntity<List<Field>> getMyFields() {
-        List<Field> fields = fieldService.getMyFields();
+    public ResponseEntity<List<Field>> getAllFields() {
+        List<Field> fields = fieldRepository.findAll();
         return ResponseEntity.ok(fields);
     }
 
-    /**
-     * Get active fields only
-     * GET /api/fields/active
-     */
-    @GetMapping("/active")
-    public ResponseEntity<List<Field>> getActiveFields() {
-        List<Field> fields = fieldService.getActiveFields();
-        return ResponseEntity.ok(fields);
-    }
-
-    /**
-     * Get field by ID
-     * GET /api/fields/1
-     */
+    // GET single field by ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getFieldById(@PathVariable Long id) {
-        try {
-            Field field = fieldService.getFieldById(id);
-            return ResponseEntity.ok(field);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<Field> getFieldById(@PathVariable Long id) {
+        Field field = fieldRepository.findById(id).orElse(null);
+        if (field == null) {
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(field);
     }
 
-    /**
-     * Update field
-     * PUT /api/fields/1
-     */
+    // CREATE new field
+    @PostMapping
+    public ResponseEntity<?> createField(@RequestBody Field field) {
+        // Get or create test user
+        User testUser = userRepository.findById(1L).orElse(null);
+        if (testUser == null) {
+            testUser = new User();
+            testUser.setUsername("test");
+            testUser.setEmail("test@test.com");
+            testUser.setPassword("test");
+            testUser = userRepository.save(testUser);
+        }
+
+        field.setUser(testUser);
+        Field savedField = fieldRepository.save(field);
+        return ResponseEntity.ok(savedField);
+    }
+
+    // UPDATE field
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateField(
-            @PathVariable Long id,
-            @RequestBody CreateFieldRequest request) {
-        try {
-            Field field = fieldService.updateField(id, request);
-            return ResponseEntity.ok(field);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<Field> updateField(@PathVariable Long id, @RequestBody Field fieldDetails) {
+        Field field = fieldRepository.findById(id).orElse(null);
+        if (field == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        field.setName(fieldDetails.getName());
+        field.setLocation(fieldDetails.getLocation());
+        field.setAreaHectares(fieldDetails.getAreaHectares());
+        field.setSoilType(fieldDetails.getSoilType());
+        field.setIrrigationType(fieldDetails.getIrrigationType());
+        field.setDescription(fieldDetails.getDescription());
+
+        Field updatedField = fieldRepository.save(field);
+        return ResponseEntity.ok(updatedField);
     }
 
-    /**
-     * Delete field (soft delete)
-     * DELETE /api/fields/1
-     */
+    // DELETE field
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteField(@PathVariable Long id) {
-        try {
-            fieldService.deleteField(id);
-            return ResponseEntity.ok("Field deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        Field field = fieldRepository.findById(id).orElse(null);
+        if (field == null) {
+            return ResponseEntity.notFound().build();
         }
+
+        fieldRepository.delete(field);
+        return ResponseEntity.ok().build();
     }
 }

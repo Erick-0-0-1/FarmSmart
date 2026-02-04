@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-// Base URL for your Spring Boot backend
-const API_BASE_URL = 'http://localhost:8080/api';
+// API base URL - uses environment variable in production
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -11,7 +10,7 @@ const api = axios.create({
   },
 });
 
-// Add token to requests (if available)
+// Request interceptor to add token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -21,6 +20,18 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Unauthorized - could redirect to login
+      localStorage.removeItem('token');
+    }
     return Promise.reject(error);
   }
 );
