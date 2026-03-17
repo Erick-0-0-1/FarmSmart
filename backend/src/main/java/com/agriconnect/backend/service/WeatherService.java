@@ -1,17 +1,19 @@
 package com.agriconnect.backend.service;
 
-import com.agriconnect.backend.dto.WeatherForecast;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import com.agriconnect.backend.dto.WeatherForecast;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import reactor.core.publisher.Mono;
 
 @Service
 public class WeatherService {
@@ -35,20 +37,20 @@ public class WeatherService {
     }
 
     /**
-     * Get 7-day weather forecast for Isabela
+     * Get 5‑day weather forecast for Isabela (using default coordinates)
      */
-    public List<WeatherForecast> get7DayForecast() {
-        return get7DayForecast(defaultLat, defaultLon);
+    public List<WeatherForecast> get5DayForecast() {
+        return get5DayForecast(defaultLat, defaultLon);
     }
 
     /**
-     * Get 7-day weather forecast for specific coordinates
+     * Get 5‑day weather forecast for specific coordinates
      */
-    public List<WeatherForecast> get7DayForecast(Double lat, Double lon) {
+    public List<WeatherForecast> get5DayForecast(Double lat, Double lon) {
         List<WeatherForecast> forecasts = new ArrayList<>();
 
         try {
-            // Call OpenWeatherMap 5-day/3-hour forecast API
+            // Call OpenWeatherMap 5-day / 3-hour forecast API
             String url = apiUrl + "/forecast?lat=" + lat + "&lon=" + lon
                     + "&appid=" + apiKey + "&units=metric";
 
@@ -62,7 +64,6 @@ public class WeatherService {
             if (data != null && data.has("list")) {
                 JsonNode forecastList = data.get("list");
 
-                // Process forecast data
                 LocalDate currentDate = null;
                 WeatherForecast dailyForecast = null;
                 double totalTemp = 0;
@@ -91,8 +92,8 @@ public class WeatherService {
 
                             forecasts.add(dailyForecast);
 
-                            // Stop after 7 days
-                            if (forecasts.size() >= 7) {
+                            // Stop after 5 days
+                            if (forecasts.size() >= 5) {
                                 break;
                             }
                         }
@@ -132,8 +133,8 @@ public class WeatherService {
                     dominantCondition = weather.get("main").asText();
                 }
 
-                // Add last day
-                if (dailyForecast != null && forecasts.size() < 7) {
+                // Add last day if we haven't reached 5 yet
+                if (dailyForecast != null && forecasts.size() < 5) {
                     dailyForecast.setTemperature(totalTemp / tempCount);
                     dailyForecast.setHumidity(totalHumidity / humidityCount);
                     dailyForecast.setRainfall(maxRainfall);
@@ -194,12 +195,13 @@ public class WeatherService {
 
     /**
      * Mock forecast for testing (when API is down or during development)
+     * Returns 5 days of mock data.
      */
     private List<WeatherForecast> getMockForecast() {
         List<WeatherForecast> forecasts = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 5; i++) {
             WeatherForecast forecast = new WeatherForecast();
             forecast.setDate(today.plusDays(i));
             forecast.setTemperature(28.0 + (Math.random() * 4 - 2));
