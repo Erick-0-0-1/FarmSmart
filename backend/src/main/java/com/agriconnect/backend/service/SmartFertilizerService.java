@@ -1,15 +1,15 @@
 package com.agriconnect.backend.service;
 
-import com.agriconnect.backend.dto.FertilizerRecommendation;
-import com.agriconnect.backend.dto.WeatherForecast;
-import com.agriconnect.backend.model.FertilizerApplication;
-import com.agriconnect.backend.model.PlantingRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.agriconnect.backend.dto.FertilizerRecommendation;
+import com.agriconnect.backend.dto.WeatherForecast;
+import com.agriconnect.backend.model.PlantingRecord;
 
 @Service
 public class SmartFertilizerService {
@@ -27,8 +27,8 @@ public class SmartFertilizerService {
 
         FertilizerRecommendation recommendation = new FertilizerRecommendation();
 
-        // Get 7-day forecast
-        List<WeatherForecast> forecast = weatherService.get7DayForecast();
+        // Get 5-day forecast
+        List<WeatherForecast> forecast = weatherService.get5DayForecast();
         recommendation.setWeekForecast(forecast);
 
         // Calculate urgency
@@ -36,7 +36,7 @@ public class SmartFertilizerService {
         String urgency = calculateUrgency(daysFromSchedule);
         recommendation.setUrgencyLevel(urgency);
 
-        // Find best day in the week
+        // Find best day in the forecast (now 5 days)
         WeatherForecast bestDay = findBestDay(forecast);
         LocalDate bestDate = bestDay.getDate();
         recommendation.setBestDate(bestDate);
@@ -81,7 +81,7 @@ public class SmartFertilizerService {
     }
 
     /**
-     * Find the best day in the 7-day forecast
+     * Find the best day in the 5‑day forecast
      */
     private WeatherForecast findBestDay(List<WeatherForecast> forecast) {
         WeatherForecast best = forecast.get(0);
@@ -174,7 +174,7 @@ public class SmartFertilizerService {
             boolean worseAhead = true;
             for (int i = 1; i < Math.min(3, today.getDate().until(scheduledDate, ChronoUnit.DAYS)); i++) {
                 // If upcoming days are better, wait
-                if (scoreDay(weatherService.get7DayForecast().get(i)) > 50) {
+                if (scoreDay(weatherService.get5DayForecast().get(i)) > 50) {
                     worseAhead = false;
                     break;
                 }
@@ -205,7 +205,7 @@ public class SmartFertilizerService {
     }
 
     /**
-     * Generate detailed advice with full week analysis
+     * Generate detailed advice with full 5‑day analysis
      */
     private String generateDetailedAdvice(
             List<WeatherForecast> forecast,
@@ -231,8 +231,8 @@ public class SmartFertilizerService {
 
         advice.append("Urgency Level: ").append(urgency).append("\n\n");
 
-        // Week forecast summary
-        advice.append("📅 7-DAY FORECAST:\n\n");
+        // 5‑day forecast summary
+        advice.append("📅 5-DAY FORECAST:\n\n");
         for (int i = 0; i < forecast.size(); i++) {
             WeatherForecast day = forecast.get(i);
             String dayLabel = i == 0 ? "TODAY" :
