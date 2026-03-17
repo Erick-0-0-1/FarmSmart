@@ -33,25 +33,26 @@ public class WeatherController {
     }
 
     /**
-     * Get 7-day forecast for Isabela
+     * Get 5-day forecast for Isabela (replaces previous 7-day)
      * GET /api/weather/forecast
      */
     @GetMapping("/forecast")
-    public ResponseEntity<List<WeatherForecast>> get7DayForecast(Authentication authentication) {
-        List<WeatherForecast> forecast = weatherService.get7DayForecast();
+    public ResponseEntity<List<WeatherForecast>> get5DayForecast(Authentication authentication) {
+        // Default coordinates for Isabela; you could also get them from user profile
+        List<WeatherForecast> forecast = weatherService.get5DayForecast(16.9754, 121.8107);
         return ResponseEntity.ok(forecast);
     }
 
     /**
-     * Get forecast for specific coordinates
-     * GET /api/weather/forecast?lat=16.9754&lon=121.8107
+     * Get 5-day forecast for specific coordinates
+     * GET /api/weather/forecast/location?lat=...&lon=...
      */
     @GetMapping("/forecast/location")
     public ResponseEntity<List<WeatherForecast>> getForecastByLocation(
             @RequestParam Double lat,
             @RequestParam Double lon,
             Authentication authentication) {
-        List<WeatherForecast> forecast = weatherService.get7DayForecast(lat, lon);
+        List<WeatherForecast> forecast = weatherService.get5DayForecast(lat, lon);
         return ResponseEntity.ok(forecast);
     }
 }
