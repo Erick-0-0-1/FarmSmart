@@ -32,7 +32,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/health").permitAll()  // Health check endpoints
                         .requestMatchers("/api/auth/**").permitAll()  // Allow registration/login
-                        .requestMatchers("/api/**").authenticated()   // Require auth for other APIs
+                        // Public API endpoints for weather, fields, etc. (no authentication required)
+                        .requestMatchers("/api/weather/**").permitAll()
+                        .requestMatchers("/api/fields/**").permitAll()
+                        .requestMatchers("/api/plantings/**").permitAll()
+                        .requestMatchers("/api/fertilizer/**").permitAll()
+                        // All other /api/** endpoints require authentication
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

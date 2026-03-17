@@ -61,7 +61,7 @@ public class CorsConfig {
             corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         }
         
-corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowCredentials(true);
 
         // Allow all common headers
         corsConfiguration.setAllowedHeaders(Arrays.asList(
