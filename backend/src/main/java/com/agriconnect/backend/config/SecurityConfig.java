@@ -30,9 +30,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {})  // Let CorsFilter handle CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/health").permitAll()  // Health check endpoints
-                        .requestMatchers("/api/auth/**").permitAll()  // Allow registration/login
-                        // Public API endpoints for weather, fields, etc. (no authentication required)
+                        .requestMatchers("/", "/health").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Public API endpoints
                         .requestMatchers("/api/weather/**").permitAll()
                         .requestMatchers("/api/fields/**").permitAll()
                         .requestMatchers("/api/plantings/**").permitAll()
