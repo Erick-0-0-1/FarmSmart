@@ -67,19 +67,37 @@ function Dashboard() {
     setIsModalOpen(true);
   };
 
-  // NEW: Delete handler
-  const handleDelete = async (field) => {
-    if (window.confirm('Are you sure you want to delete this field?')) {
-      try {
-        await deleteField(field.id);
-        // Reload fields to get updated list
-        await loadData();
-      } catch (error) {
-        console.error('Failed to delete field:', error);
+  // Inside Dashboard component, add this function
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  window.location.href = '/login';
+};
+
+// Update handleDelete to show server response
+const handleDelete = async (field) => {
+  if (window.confirm('Are you sure you want to delete this field?')) {
+    try {
+      await deleteField(field.id);
+      await loadData();
+    } catch (error) {
+      console.error('Failed to delete field:', error);
+      if (error.response) {
+        alert(`Failed to delete field: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`);
+      } else {
         alert('Failed to delete field. Please try again.');
       }
     }
-  };
+  }
+};
+
+// In the render, pass onLogout to Navbar:
+<Navbar
+  currentPage={currentPage}
+  setCurrentPage={setCurrentPage}
+  onLogout={handleLogout}
+/>
+
+  
 
   const getWeatherEmoji = (condition) => {
     const lower = condition?.toLowerCase() || '';

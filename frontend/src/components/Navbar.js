@@ -2,7 +2,7 @@ import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 
-function Navbar({ currentPage, setCurrentPage }) {
+function Navbar({ currentPage, setCurrentPage, onLogout }) {
   const { t, language, toggleLanguage } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
 
@@ -49,6 +49,15 @@ function Navbar({ currentPage, setCurrentPage }) {
 
           {/* Right Side Buttons */}
           <div className="flex items-center gap-2">
+            {/* Logout Button */}
+            <button
+              onClick={onLogout}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+              title="Logout"
+            >
+              🚪
+            </button>
+
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
