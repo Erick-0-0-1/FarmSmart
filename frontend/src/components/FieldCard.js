@@ -6,7 +6,7 @@ function FieldCard({ field, onView, onEdit, onDelete }) {
 
   return (
     <div className="bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-200 dark:border-gray-600">
-      {/* Field Name */}
+      {/* Field Name and Status */}
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white">{field.name}</h3>
         <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full">
@@ -51,9 +51,15 @@ function FieldCard({ field, onView, onEdit, onDelete }) {
         </button>
         <button
           onClick={() => onEdit(field)}
-          className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition text-sm font-medium"
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition text-sm font-medium"
         >
           {t('edit')}
+        </button>
+        <button
+          onClick={() => onDelete(field)}
+          className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 transition text-sm font-medium"
+        >
+          {t('delete')}
         </button>
       </div>
     </div>
