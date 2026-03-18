@@ -67,6 +67,20 @@ function Dashboard() {
     setIsModalOpen(true);
   };
 
+  // NEW: Delete handler
+  const handleDelete = async (field) => {
+    if (window.confirm('Are you sure you want to delete this field?')) {
+      try {
+        await deleteField(field.id);
+        // Reload fields to get updated list
+        await loadData();
+      } catch (error) {
+        console.error('Failed to delete field:', error);
+        alert('Failed to delete field. Please try again.');
+      }
+    }
+  };
+
   const getWeatherEmoji = (condition) => {
     const lower = condition?.toLowerCase() || '';
     if (lower.includes('clear') || lower.includes('sunny')) return '☀️';
@@ -85,7 +99,6 @@ function Dashboard() {
       </div>
     );
   }
-
 
   if (currentPage === 'planting') {
     return (
@@ -118,31 +131,6 @@ function Dashboard() {
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
               Coming soon! This will show all your fields in detail.
-            </p>
-            <button
-              onClick={() => setCurrentPage('dashboard')}
-              className="mt-6 px-6 py-3 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition"
-            >
-              Back to Dashboard
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (currentPage === 'planting') {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🌱</div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Planting Records
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Coming soon! Track your plantings and crop cycles.
             </p>
             <button
               onClick={() => setCurrentPage('dashboard')}
@@ -326,6 +314,7 @@ function Dashboard() {
                       field={field}
                       onView={handleView}
                       onEdit={handleEdit}
+                      onDelete={handleDelete}   // <-- Added delete handler
                     />
                   ))}
                 </div>
