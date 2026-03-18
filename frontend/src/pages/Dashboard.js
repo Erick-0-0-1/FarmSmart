@@ -268,7 +268,7 @@ function Dashboard() {
                     <div className="text-5xl">{getWeatherEmoji(weather.condition)}</div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-blue-400">
-                    <p className="text-xs text-blue-100">Click to view 7-day forecast →</p>
+                    <p className="text-xs text-blue-100">Click to view 5-day forecast →</p>
                   </div>
                 </div>
               )}
