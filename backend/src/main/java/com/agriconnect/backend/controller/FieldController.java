@@ -48,7 +48,7 @@ public class FieldController {
     public ResponseEntity<List<Field>> getAllFields(Authentication authentication) {
         Optional<User> currentUser = getCurrentUser(authentication);
         if (currentUser.isEmpty()) {
-            // For unauthenticated users, return an empty list (or you could return a 401, but the requirement is public)
+            // For unauthenticated users, return an empty list (public)
             return ResponseEntity.ok(List.of());
         }
         List<Field> fields = fieldRepository.findByUserOrderByCreatedAtDesc(currentUser.get());
