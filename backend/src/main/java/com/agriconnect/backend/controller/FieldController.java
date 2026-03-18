@@ -3,6 +3,8 @@ package com.agriconnect.backend.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,7 @@ import com.agriconnect.backend.repository.UserRepository;
 @RestController
 @RequestMapping("/api/fields")
 public class FieldController {
+    private static final Logger logger = LoggerFactory.getLogger(FieldController.class);
 
     private final FieldRepository fieldRepository;
     private final UserRepository userRepository;
@@ -32,32 +35,27 @@ public class FieldController {
         this.userRepository = userRepository;
     }
 
-    // Helper to get current authenticated user, returns Optional.empty() if not authenticated
     private Optional<User> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            logger.debug("No authenticated user found");
             return Optional.empty();
         }
         String username = authentication.getName();
+        logger.debug("Authenticated user: {}", username);
         return userRepository.findByUsername(username);
     }
 
-    /**
-     * GET /api/fields - returns all fields for authenticated user, or empty list for unauthenticated.
-     */
     @GetMapping
     public ResponseEntity<List<Field>> getAllFields(Authentication authentication) {
         Optional<User> currentUser = getCurrentUser(authentication);
         if (currentUser.isEmpty()) {
-            // For unauthenticated users, return an empty list (public)
+            logger.debug("Returning empty field list for unauthenticated user");
             return ResponseEntity.ok(List.of());
         }
         List<Field> fields = fieldRepository.findByUserOrderByCreatedAtDesc(currentUser.get());
         return ResponseEntity.ok(fields);
     }
 
-    /**
-     * GET /api/fields/{id} - returns field if it belongs to authenticated user, otherwise 404.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<Field> getFieldById(@PathVariable Long id, Authentication authentication) {
         Optional<User> currentUser = getCurrentUser(authentication);
@@ -71,9 +69,6 @@ public class FieldController {
         return ResponseEntity.ok(field);
     }
 
-    /**
-     * POST /api/fields - create a field for authenticated user.
-     */
     @PostMapping
     public ResponseEntity<?> createField(@RequestBody Field field, Authentication authentication) {
         Optional<User> currentUser = getCurrentUser(authentication);
@@ -85,9 +80,6 @@ public class FieldController {
         return ResponseEntity.ok(savedField);
     }
 
-    /**
-     * PUT /api/fields/{id} - update field if owned by authenticated user.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<Field> updateField(@PathVariable Long id, @RequestBody Field fieldDetails, Authentication authentication) {
         Optional<User> currentUser = getCurrentUser(authentication);
@@ -110,20 +102,25 @@ public class FieldController {
         return ResponseEntity.ok(updatedField);
     }
 
-    /**
-     * DELETE /api/fields/{id} - delete field if owned by authenticated user.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteField(@PathVariable Long id, Authentication authentication) {
+        logger.info("Delete request for field id: {}", id);
         Optional<User> currentUser = getCurrentUser(authentication);
         if (currentUser.isEmpty()) {
+            logger.warn("Delete failed: user not authenticated");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         Field field = fieldRepository.findById(id).orElse(null);
-        if (field == null || !field.getUser().getId().equals(currentUser.get().getId())) {
+        if (field == null) {
+            logger.warn("Delete failed: field not found");
+            return ResponseEntity.notFound().build();
+        }
+        if (!field.getUser().getId().equals(currentUser.get().getId())) {
+            logger.warn("Delete failed: field not owned by user");
             return ResponseEntity.notFound().build();
         }
         fieldRepository.delete(field);
+        logger.info("Field deleted successfully");
         return ResponseEntity.ok().build();
     }
 }
