@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
-function PlantingCard({ planting, onView, onEdit, onHarvest }) {
+function PlantingCard({ planting, onView, onEdit, onHarvest, onDelete }) {
   const { t } = useLanguage();
 
   const getStatusColor = (status) => {
@@ -136,7 +136,7 @@ function PlantingCard({ planting, onView, onEdit, onHarvest }) {
         >
           View Details
         </button>
-        {planting.status !== 'HARVESTED' && (
+        {planting.status !== 'HARVESTED' ? (
           <>
             <button
               onClick={() => onEdit(planting)}
@@ -153,7 +153,14 @@ function PlantingCard({ planting, onView, onEdit, onHarvest }) {
               </button>
             )}
           </>
-        )}
+        ) : null}
+        {/* Delete button – always visible (you can change condition if needed) */}
+        <button
+          onClick={() => onDelete(planting)}
+          className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 transition text-sm font-medium"
+        >
+          Delete
+        </button>
       </div>
     </div>
   );

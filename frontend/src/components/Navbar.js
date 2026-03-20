@@ -49,13 +49,12 @@ function Navbar({ currentPage, setCurrentPage, onLogout }) {
 
           {/* Right Side Buttons */}
           <div className="flex items-center gap-2">
-            {/* Logout Button */}
+            {/* Logout Button (now text, no icon) */}
             <button
               onClick={onLogout}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
-              title="Logout"
+              className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium"
             >
-              🚪
+              Logout
             </button>
 
             {/* Dark Mode Toggle */}

@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import PlantingCard from '../components/PlantingCard';
 import PlantingModal from '../components/PlantingModal';
-import { getPlantings, createPlanting, updatePlanting, markAsHarvested } from '../services/plantingService';
+import {
+  getPlantings,
+  createPlanting,
+  updatePlanting,
+  markAsHarvested,
+  deletePlanting,   // <-- import the delete function
+} from '../services/plantingService';
 import { getFields } from '../services/fieldServices';
 import { getVarieties } from '../services/varietyService';
 
@@ -26,7 +32,7 @@ function PlantingPage() {
       const [plantingsData, fieldsData, varietiesData] = await Promise.all([
         getPlantings(),
         getFields(),
-        getVarieties()
+        getVarieties(),
       ]);
       setPlantings(plantingsData);
       setFields(fieldsData);
@@ -80,9 +86,27 @@ function PlantingPage() {
     }
   };
 
+  // NEW: Delete handler
+  const handleDelete = async (planting) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete the planting for ${planting.riceVariety?.name}?`
+    );
+    if (!confirmed) return;
+
+    try {
+      await deletePlanting(planting.id);
+      // Remove from local state
+      setPlantings((prev) => prev.filter((p) => p.id !== planting.id));
+    } catch (error) {
+      console.error('Failed to delete planting:', error);
+      // Show server error message if available
+      alert(error.response?.data?.message || 'Failed to delete planting. Please try again.');
+    }
+  };
+
   const getFilteredPlantings = () => {
     if (filter === 'ALL') return plantings;
-    return plantings.filter(p => p.status === filter);
+    return plantings.filter((p) => p.status === filter);
   };
 
   const filteredPlantings = getFilteredPlantings();
@@ -90,10 +114,10 @@ function PlantingPage() {
   const getStatusCounts = () => {
     return {
       all: plantings.length,
-      planning: plantings.filter(p => p.status === 'PLANNING').length,
-      planted: plantings.filter(p => p.status === 'PLANTED').length,
-      growing: plantings.filter(p => p.status === 'GROWING').length,
-      harvested: plantings.filter(p => p.status === 'HARVESTED').length,
+      planning: plantings.filter((p) => p.status === 'PLANNING').length,
+      planted: plantings.filter((p) => p.status === 'PLANTED').length,
+      growing: plantings.filter((p) => p.status === 'GROWING').length,
+      harvested: plantings.filter((p) => p.status === 'HARVESTED').length,
     };
   };
 
@@ -202,7 +226,7 @@ function PlantingPage() {
                 You need to create at least one field before you can start planting.
               </p>
               <button
-                onClick={() => window.location.href = '#/dashboard'}
+                onClick={() => (window.location.href = '#/dashboard')}
                 className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition text-sm font-medium"
               >
                 Go to Dashboard to Create Field
@@ -222,8 +246,7 @@ function PlantingPage() {
           <p className="text-gray-400 dark:text-gray-500 mb-6">
             {fields.length === 0
               ? 'Create a field first, then start tracking your rice crops!'
-              : 'Click "New Planting" to start tracking your rice crops!'
-            }
+              : 'Click "New Planting" to start tracking your rice crops!'}
           </p>
           {fields.length > 0 && (
             <button
@@ -243,6 +266,7 @@ function PlantingPage() {
               onView={handleView}
               onEdit={handleEdit}
               onHarvest={handleHarvest}
+              onDelete={handleDelete}   // <-- new prop
             />
           ))}
         </div>
