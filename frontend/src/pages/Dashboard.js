@@ -41,13 +41,11 @@ function Dashboard() {
   const handleCreateField = async (fieldData) => {
     try {
       if (selectedField) {
-        // Update existing field
         await updateField(selectedField.id, fieldData);
       } else {
-        // Create new field
         await createField(fieldData);
       }
-      await loadData(); // Reload fields
+      await loadData();
       setIsModalOpen(false);
       setSelectedField(null);
     } catch (error) {
@@ -57,7 +55,6 @@ function Dashboard() {
   };
 
   const handleView = (field) => {
-    // TODO: Navigate to field details page
     console.log('View field:', field);
     alert(`Viewing field: ${field.name}\n(Details page coming soon!)`);
   };
@@ -67,37 +64,31 @@ function Dashboard() {
     setIsModalOpen(true);
   };
 
-  // Inside Dashboard component, add this function
-const handleLogout = () => {
-  localStorage.removeItem('token');
-  window.location.href = '/login';
-};
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
 
-// Update handleDelete to show server response
-const handleDelete = async (field) => {
-  if (window.confirm('Are you sure you want to delete this field?')) {
-    try {
-      await deleteField(field.id);
-      await loadData();
-    } catch (error) {
-      console.error('Failed to delete field:', error);
-      if (error.response) {
-        alert(`Failed to delete field: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`);
-      } else {
-        alert('Failed to delete field. Please try again.');
+  const handleDelete = async (field) => {
+    if (window.confirm('Are you sure you want to delete this field?')) {
+      try {
+        await deleteField(field.id);
+        await loadData();
+      } catch (error) {
+        console.error('Failed to delete field:', error);
+        if (error.response) {
+          // Show a specific message for 409 Conflict (field has planting records)
+          if (error.response.status === 409) {
+            alert('Cannot delete this field because it has active planting records. Please delete all planting records for this field first.');
+          } else {
+            alert(`Failed to delete field: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`);
+          }
+        } else {
+          alert('Failed to delete field. Please try again.');
+        }
       }
     }
-  }
-};
-
-// In the render, pass onLogout to Navbar:
-<Navbar
-  currentPage={currentPage}
-  setCurrentPage={setCurrentPage}
-  onLogout={handleLogout}
-/>
-
-  
+  };
 
   const getWeatherEmoji = (condition) => {
     const lower = condition?.toLowerCase() || '';
@@ -108,11 +99,11 @@ const handleDelete = async (field) => {
     return '🌤️';
   };
 
-  // Render different pages based on currentPage
+  // Render different pages
   if (currentPage === 'weather') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} onLogout={handleLogout} />
         <WeatherCalendar />
       </div>
     );
@@ -121,7 +112,7 @@ const handleDelete = async (field) => {
   if (currentPage === 'planting') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} onLogout={handleLogout} />
         <PlantingPage />
       </div>
     );
@@ -130,17 +121,16 @@ const handleDelete = async (field) => {
   if (currentPage === 'fertilizer') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} onLogout={handleLogout} />
         <FertilizerSchedulePage />
       </div>
     );
   }
 
-  // Placeholder pages for other navigation items
   if (currentPage === 'fields') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} onLogout={handleLogout} />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🌾</div>
@@ -165,7 +155,7 @@ const handleDelete = async (field) => {
   if (currentPage === 'marketplace') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} onLogout={handleLogout} />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🛒</div>
@@ -190,7 +180,7 @@ const handleDelete = async (field) => {
   if (currentPage === 'community') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} onLogout={handleLogout} />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-20">
             <div className="text-6xl mb-4">👥</div>
@@ -215,12 +205,9 @@ const handleDelete = async (field) => {
   // Default: Dashboard page
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-      {/* Navigation */}
-      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} onLogout={handleLogout} />
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             {t('welcome')}, Farmer! 👋
@@ -242,9 +229,7 @@ const handleDelete = async (field) => {
           </div>
         ) : (
           <>
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {/* Active Fields */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition">
                 <div className="flex items-center justify-between">
                   <div>
@@ -259,7 +244,6 @@ const handleDelete = async (field) => {
                 </div>
               </div>
 
-              {/* Weather */}
               {weather && (
                 <div
                   onClick={() => setCurrentPage('weather')}
@@ -279,7 +263,6 @@ const handleDelete = async (field) => {
                 </div>
               )}
 
-              {/* Upcoming Tasks */}
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition">
                 <div className="flex items-center justify-between">
                   <div>
@@ -293,7 +276,6 @@ const handleDelete = async (field) => {
               </div>
             </div>
 
-            {/* Fields Section */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{t('myFields')}</h3>
@@ -332,7 +314,7 @@ const handleDelete = async (field) => {
                       field={field}
                       onView={handleView}
                       onEdit={handleEdit}
-                      onDelete={handleDelete}   // <-- Added delete handler
+                      onDelete={handleDelete}
                     />
                   ))}
                 </div>
@@ -342,7 +324,6 @@ const handleDelete = async (field) => {
         )}
       </main>
 
-      {/* Field Modal */}
       <FieldModal
         isOpen={isModalOpen}
         onClose={() => {
