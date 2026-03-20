@@ -17,8 +17,17 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedField, setSelectedField] = useState(null);
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
+    // Load username from localStorage
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    } else {
+      setUsername('Farmer');
+    }
+
     loadData();
   }, []);
 
@@ -66,6 +75,7 @@ function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
     window.location.href = '/login';
   };
 
@@ -77,7 +87,6 @@ function Dashboard() {
       } catch (error) {
         console.error('Failed to delete field:', error);
         if (error.response) {
-          // Show a specific message for 409 Conflict (field has planting records)
           if (error.response.status === 409) {
             alert('Cannot delete this field because it has active planting records. Please delete all planting records for this field first.');
           } else {
@@ -210,7 +219,7 @@ function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {t('welcome')}, Farmer! 👋
+            {t('welcome')}, {username}! 👋
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
             {new Date().toLocaleDateString('en-US', {
