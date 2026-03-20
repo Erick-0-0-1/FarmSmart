@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -103,26 +104,33 @@ public class FieldController {
         return ResponseEntity.ok(updatedField);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("permitAll()") // Override any method‑level security
-    public ResponseEntity<?> deleteField(@PathVariable Long id, Authentication authentication) {
-        logger.info("DELETE request received for field id: {}", id);
-        Optional<User> currentUser = getCurrentUser(authentication);
-        if (currentUser.isEmpty()) {
-            logger.warn("Delete failed: user not authenticated");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        Field field = fieldRepository.findById(id).orElse(null);
-        if (field == null) {
-            logger.warn("Delete failed: field not found");
-            return ResponseEntity.notFound().build();
-        }
-        if (!field.getUser().getId().equals(currentUser.get().getId())) {
-            logger.warn("Delete failed: field not owned by user");
-            return ResponseEntity.notFound().build();
-        }
+   @DeleteMapping("/{id}")
+@PreAuthorize("permitAll()")
+public ResponseEntity<?> deleteField(@PathVariable Long id, Authentication authentication) {
+    logger.info("DELETE request received for field id: {}", id);
+    Optional<User> currentUser = getCurrentUser(authentication);
+    if (currentUser.isEmpty()) {
+        logger.warn("Delete failed: user not authenticated");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    Field field = fieldRepository.findById(id).orElse(null);
+    if (field == null) {
+        logger.warn("Delete failed: field not found");
+        return ResponseEntity.notFound().build();
+    }
+    if (!field.getUser().getId().equals(currentUser.get().getId())) {
+        logger.warn("Delete failed: field not owned by user");
+        return ResponseEntity.notFound().build();
+    }
+
+    try {
         fieldRepository.delete(field);
         logger.info("Field deleted successfully");
         return ResponseEntity.ok().build();
+    } catch (DataIntegrityViolationException e) {
+        logger.error("Cannot delete field because it has associated planting records", e);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("Cannot delete field because it has existing planting records. Please delete those records first.");
     }
+}
 }
