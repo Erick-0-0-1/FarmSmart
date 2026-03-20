@@ -31,8 +31,8 @@ function Navbar({ currentPage, setCurrentPage, onLogout }) {
         <div className="flex justify-between items-center h-16">
           {/* Logo / Username */}
           <div className="flex items-center">
-            <h1 className="text-3xl font-bold text-green-600 dark:text-green-400">
-              {username ? `🌾  ${username}` : '🌾 EJ Farm'}
+            <h1 className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {username ? `  ${username}` : '🌾 EJ Farm'}
             </h1>
           </div>
 
