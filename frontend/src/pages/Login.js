@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; // import jwt-decode
 import api from '../services/api';
 
 const Login = () => {
@@ -15,7 +16,21 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await api.post('/auth/login', formData);
-      localStorage.setItem('token', response.data.token);
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+
+      // Decode token to get username
+      try {
+        const decoded = jwtDecode(token);
+        // Try to get username from common JWT fields
+        const username = decoded.sub || decoded.username || decoded.userId || formData.username;
+        localStorage.setItem('username', username);
+      } catch (decodeError) {
+        console.error('Failed to decode token, using entered username as fallback', decodeError);
+        // Fallback to the username from the form
+        localStorage.setItem('username', formData.username);
+      }
+
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');

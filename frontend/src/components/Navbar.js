@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 
 function Navbar({ currentPage, setCurrentPage, onLogout }) {
   const { t, language, toggleLanguage } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    // Get username from localStorage
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   const navItems = [
     { id: 'dashboard', label: t('dashboard'), icon: '📊' },
@@ -20,10 +29,10 @@ function Navbar({ currentPage, setCurrentPage, onLogout }) {
     <nav className="bg-white dark:bg-gray-800 shadow-md transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Logo / Username */}
           <div className="flex items-center">
             <h1 className="text-2xl font-bold text-green-600 dark:text-green-400">
-              🌾 EJ Farm
+              {username ? `🌾 ${username}` : '🌾 EJ Farm'}
             </h1>
           </div>
 
@@ -49,7 +58,7 @@ function Navbar({ currentPage, setCurrentPage, onLogout }) {
 
           {/* Right Side Buttons */}
           <div className="flex items-center gap-2">
-            {/* Logout Button (now text, no icon) */}
+            {/* Logout Button (text) */}
             <button
               onClick={onLogout}
               className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium"
@@ -76,7 +85,7 @@ function Navbar({ currentPage, setCurrentPage, onLogout }) {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation (unchanged) */}
         <div className="md:hidden pb-3 flex overflow-x-auto space-x-2">
           {navItems.map((item) => (
             <button
