@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -103,8 +104,9 @@ public class FieldController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("permitAll()") // Override any method‑level security
     public ResponseEntity<?> deleteField(@PathVariable Long id, Authentication authentication) {
-        logger.info("Delete request for field id: {}", id);
+        logger.info("DELETE request received for field id: {}", id);
         Optional<User> currentUser = getCurrentUser(authentication);
         if (currentUser.isEmpty()) {
             logger.warn("Delete failed: user not authenticated");
